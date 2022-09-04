@@ -1,7 +1,7 @@
 import { Router } from 'express'
-import CardRoute from './CardRoutes.js'
-import RechargeRoutes from './RechargeRoutes.js'
-import PurchaseRoutes from './PurchaseRoutes.js'
+import CardRoute from './CardRoutes'
+import RechargeRoutes from './RechargeRoutes'
+import PurchaseRoutes from './PurchaseRoutes'
 
 const router = Router();
 

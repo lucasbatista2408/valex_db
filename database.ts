@@ -5,7 +5,7 @@ dotenv.config();
 
 const { Pool } = pg;
 
-const db_uri:string = process.env.DATABASE_URL
+const db_uri:string = String(process.env.DATABASE_URL)
 console.log(db_uri)
 
 const databaseConfig = {
