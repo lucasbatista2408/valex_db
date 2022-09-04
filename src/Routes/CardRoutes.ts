@@ -12,10 +12,10 @@ router.post('/new-card', CardMiddleware.checkCompanyExist, CardMiddleware.checkB
 router.post('/activate-card', CardMiddleware.checkCard, activateCard);
 
 //check balance and transactions
-router.get('/display/balance');
+router.get('/display/balance', );
 
 //unblock card
-router.post('/card/unblock')
+router.post('/card/unblock', )
 
 //block card
 router.post('/card/block')

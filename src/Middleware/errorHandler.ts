@@ -10,6 +10,9 @@ export default function errorHandler (error: any, req: Request, res: Response, n
   if(error.type === "forbidden"){
     return res.status(403).send(error.message)
   }
+  if(error.type === "could_not_update"){
+    return res.status(400).send(error.message)
+  }
 
   res.sendStatus(500); 
 }

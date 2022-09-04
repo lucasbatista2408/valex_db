@@ -46,6 +46,9 @@ export async function checkCard(req: Request, res: Response, next:NextFunction){
 
   decrypt(card.securityCode, cvv)
 
-  console.log("deu bom")
+  res.locals.userId = card.employeeId;
+  res.locals.type = card.type
+  res.locals.cardId = card.id;
+
   next()
 }
