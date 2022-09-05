@@ -115,7 +115,7 @@ export async function checkIfBlocked( number: string, cardholderName: string,exp
   const card = await cardRepository.findByCardDetails(number, cardholderName,expirationDate)
 
   if(card.isBlocked){
-    throw {type: "forbidden", message: "card is already blocked"}
+    throw {type: "forbidden", message: "card is blocked"}
   }
 
   return card
