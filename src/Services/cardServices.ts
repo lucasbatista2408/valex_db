@@ -1,6 +1,6 @@
 import { NextFunction } from "express"
 import { findByApiKey } from "../Repositories/companyRepository";
-import { findByTypeAndEmployeeId, findByCardDetails, update, TransactionTypes, CardUpdateData } from "../Repositories/cardRepository";
+import * as cardRepository from "../Repositories/cardRepository";
 import * as employeeRepository from "../Repositories/employeeRepository";
 import dayjs from "dayjs";
 import bcrypt from 'bcrypt'
@@ -26,9 +26,9 @@ export async function checkCompanyExist(apikey: string){
   
 }
 
-export async function checkByType(type: TransactionTypes, employeeId:number){
+export async function checkByType(type: cardRepository.TransactionTypes, employeeId:number){
 
-  const exists = await findByTypeAndEmployeeId(type, employeeId)
+  const exists = await cardRepository.findByTypeAndEmployeeId(type, employeeId)
     if(exists){
       throw {type: 'error_not_found', message: "user already has a card of that type"}
     }
@@ -36,7 +36,7 @@ export async function checkByType(type: TransactionTypes, employeeId:number){
  
 export async function checkIfCardExists(number:string, cardholderName:string, expirationDate:string){
 
-  const card = await findByCardDetails(number, cardholderName, expirationDate)
+  const card = await cardRepository.findByCardDetails(number, cardholderName, expirationDate)
 
   //check if cards exists
   if(!card){
@@ -46,7 +46,7 @@ export async function checkIfCardExists(number:string, cardholderName:string, ex
   return card
 }
 
-export async function validationDate(date:string){
+export function validationDate(date:string){
   const mes = date.slice(0,2)
   const ano = date.slice(3,date.length)
   
@@ -95,16 +95,65 @@ export function getExpirationDate(){
   return expirationDate
 }
 
-export async function activateCard(cardID:number, user:number, type: TransactionTypes, pw){
-  const password = bcrypt.hashSync(pw, 10)
-  const cardData: CardUpdateData = {password}
+export async function activateCard(cardID:number, user:number, type: cardRepository.TransactionTypes, cardData:cardRepository.CardUpdateData){
+  
+  const element = cardData
 
-  await update(cardID, cardData)
+  await cardRepository.update(cardID, cardData)
 
-  const data = await findByTypeAndEmployeeId(type, user)
+  const data = await cardRepository.findByTypeAndEmployeeId(type, user)
+  console.log(data.password)
   
   if(!data.password){
     throw {type: "could_not_update", message: "error when trying to update"}
   }
 
+}
+
+export async function checkIfBlocked( number: string, cardholderName: string,expirationDate: string){
+
+  const card = await cardRepository.findByCardDetails(number, cardholderName,expirationDate)
+
+  if(card.isBlocked){
+    throw {type: "forbidden", message: "card is already blocked"}
+  }
+
+  return card
+}
+
+export async function checkIfUnblocked( number: string, cardholderName: string,expirationDate: string){
+
+  const card = await cardRepository.findByCardDetails(number, cardholderName,expirationDate)
+
+  if(!card.isBlocked){
+    throw {type: "forbidden", message: "card is already unblocked"}
+  }
+
+  return card
+}
+
+export async function blockCard(body, cardId, password){
+
+  const { cardholderName, expirationDate, number } = body
+
+  const cardData:cardRepository.CardUpdateData = {isBlocked: true}
+
+  await cardRepository.update(cardId, cardData)
+
+  const card = await cardRepository.findByCardDetails(number, cardholderName,expirationDate)
+
+  return card
+}
+
+export async function unblockCard(body, cardId, password){
+
+  const { cardholderName, expirationDate, number } = body
+
+  const cardData:cardRepository.CardUpdateData = {isBlocked: false}
+
+  await cardRepository.update(cardId, cardData)
+
+  const card = await cardRepository.findByCardDetails(number, cardholderName,expirationDate)
+
+  return card
 }

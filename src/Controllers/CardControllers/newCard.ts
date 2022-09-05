@@ -13,9 +13,9 @@ export default async function newCard(req: Request, res: Response){
   const {
     employeeId,
     password,
-    isVirtual,
+    isVirtual = false,
     originalCardId,
-    isBlocked,
+    isBlocked = true,
     type
 } = req.body;
 

@@ -1,7 +1,12 @@
 import { Router } from 'express'
 import * as CardMiddleware from '../Middleware/CardMiddleware';
+import joiValidation from '../Middleware/joiValidation';
 import newCard from '../Controllers/CardControllers/newCard';
 import activateCard from '../Controllers/CardControllers/activateCard';
+import passwordValidation from '../Middleware/passwordValidation';
+import blockCard from '../Controllers/CardControllers/blockCard';
+import unblockCard from '../Controllers/CardControllers/unblockCard';
+import { passwordSchema } from '../Schemas/passwordSchema';
 
 const router = Router();
 
@@ -9,16 +14,16 @@ const router = Router();
 router.post('/new-card', CardMiddleware.checkCompanyExist, CardMiddleware.checkByType, newCard);
 
 //activates new card
-router.post('/activate-card', CardMiddleware.checkCard, activateCard);
+router.post('/activate-card', joiValidation(passwordSchema),  CardMiddleware.checkCard, CardMiddleware.checkIfPasswordExists, activateCard);
 
 //check balance and transactions
 router.get('/display/balance', );
 
 //unblock card
-router.post('/card/unblock', )
+router.post('/card/unblock', CardMiddleware.checkCard, CardMiddleware.checkIfUnblocked, passwordValidation, unblockCard)
 
 //block card
-router.post('/card/block')
+router.post('/card/block', CardMiddleware.checkCard, CardMiddleware.checkIfBlocked, passwordValidation, blockCard)
 
 
 export default router;
