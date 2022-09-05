@@ -27,7 +27,8 @@
 	  
 ## 2.Activate Card
 
-	In order for the employee activate their card, they need to send the security code and the new password in the body of the request, and also the cardId.
+	In order for the employee activate their card, they need to send the security code and the new password in the body of the request, 
+	and also the cardId.
 		
 	path: http://localhost:4000/activate-card
 	
