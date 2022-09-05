@@ -45,12 +45,21 @@ export async function checkCard(req: Request, res: Response, next:NextFunction){
 
   await cardServices.validationDate(card.expirationDate)
 
-  decrypt(card.securityCode, cvv)
-
   res.locals.userId = card.employeeId;
   res.locals.type = card.type
   res.locals.cardId = card.id;
   res.locals.password = card.password
+  res.locals.securityCode = card.securityCode
+
+  next()
+}
+
+export function checkCVV(req:Request, res:Response, next:NextFunction){
+
+  const cvv = req.body.securityCode
+  const securityCode = res.locals.securityCode
+
+  decrypt(securityCode, cvv)
 
   next()
 }
@@ -67,27 +76,22 @@ export function checkIfPasswordExists(req: Request, res: Response, next:NextFunc
 
 export async function checkIfBlocked(req: Request, res: Response, next:NextFunction){
 
-  const cardholderName: string = req.body.cardholderName
-  const expirationDate: string = req.body.expirationDate
-  const number: string = req.body.number
+  const cardholderName: string = res.locals.cardholderName
+  const expirationDate: string = res.locals.expirationDate
+  const number: string = res.locals.number
 
-  const card = await cardServices.checkIfBlocked(number, cardholderName, expirationDate)
-  
-  res.locals.cardId = card.id
-  res.locals.password = card.password
+  await cardServices.checkIfBlocked(number, cardholderName, expirationDate)
 
   next()
 }
 
 export async function checkIfUnblocked(req: Request, res: Response, next:NextFunction){
 
-  const cardholderName: string = req.body.cardholderName
-  const expirationDate: string = req.body.expirationDate
-  const number: string = req.body.number
+  const cardholderName: string = res.locals.cardholderName
+  const expirationDate: string = res.locals.expirationDate
+  const number: string = res.locals.number
 
-  const card = await cardServices.checkIfUnblocked(number, cardholderName, expirationDate)
-  
-  res.locals.cardId = card.id
+  await cardServices.checkIfUnblocked(number, cardholderName, expirationDate)
 
   next()
 }

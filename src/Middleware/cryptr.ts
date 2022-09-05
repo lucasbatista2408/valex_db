@@ -9,7 +9,7 @@ export function encrypt(el:string){
   return crypted
 }
 
-export function decrypt(enc:string, el){
+export function decrypt(enc:string, el:string){
   const decrypt = cryptr.decrypt(enc)
   console.log(decrypt)
 

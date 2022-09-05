@@ -8,14 +8,15 @@ export async function checkCard(req: Request, res: Response, next:NextFunction){
 
   const card = await cardServices.checkIfCardExists(data.cardId)
 
-  // decrypt(card.securityCode, data.securityCode)
-
   res.locals.userId = card.employeeId;
   res.locals.type = card.type
   res.locals.cardId = card.id;
   res.locals.password = card.password
   res.locals.expirationDate = card.expirationDate
   res.locals.isBlocked = card.isBlocked
+  res.locals.securityCode = card.securityCode
+  res.locals.cardholderName = card.cardholderName
+  res.locals.number = card.number
 
   next()
 }

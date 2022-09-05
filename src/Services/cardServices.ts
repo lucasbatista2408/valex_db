@@ -2,6 +2,8 @@ import { NextFunction } from "express"
 import { findByApiKey } from "../Repositories/companyRepository";
 import * as cardRepository from "../Repositories/cardRepository";
 import * as employeeRepository from "../Repositories/employeeRepository";
+import * as rechargeRepository from "../Repositories/rechargeRepository";
+import * as paymentRepository from "../Repositories/paymentRepository";
 import dayjs from "dayjs";
 import bcrypt from 'bcrypt'
 
@@ -74,7 +76,7 @@ export async function getCardHolderName(employeeId:number){
     const user = await employeeRepository.findById(employeeId)
     
     if(!user){
-      throw {type: "not_found", message: "user not found"}
+      throw {type: "error_not_found", message: "user not found"}
     }
 
     const nameUpperSplit = user.fullName.toUpperCase().split(" ")
@@ -132,9 +134,9 @@ export async function checkIfUnblocked( number: string, cardholderName: string,e
   return card
 }
 
-export async function blockCard(body, cardId, password){
+export async function blockCard(data:any, cardId:number){
 
-  const { cardholderName, expirationDate, number } = body
+  const { cardholderName, expirationDate, number } = data
 
   const cardData:cardRepository.CardUpdateData = {isBlocked: true}
 
@@ -145,9 +147,9 @@ export async function blockCard(body, cardId, password){
   return card
 }
 
-export async function unblockCard(body, cardId, password){
+export async function unblockCard(data:any, cardId:number){
 
-  const { cardholderName, expirationDate, number } = body
+  const { cardholderName, expirationDate, number } = data
 
   const cardData:cardRepository.CardUpdateData = {isBlocked: false}
 
@@ -156,4 +158,39 @@ export async function unblockCard(body, cardId, password){
   const card = await cardRepository.findByCardDetails(number, cardholderName,expirationDate)
 
   return card
+}
+
+export async function showBalance(cardId:number){
+
+  const rechargesReq = await rechargeRepository.findByCardId(cardId)
+  const transactionsReq = await paymentRepository.findByCardId(cardId)
+
+  const recharges_value = rechargesReq.map(el => el.amount).reduce((a:number,b:number) => a+b,0)
+  const transactions_value = transactionsReq.map(el => el.amount).reduce((a:number,b:number) => a+b,0)
+
+  const recharges = formatTimestamp (rechargesReq)
+  const transactions = formatTimestamp(transactionsReq)
+
+  const balance = recharges_value - transactions_value
+
+  const data = {balance, transactions, recharges}
+
+  return data
+}
+
+export function formatTimestamp (data:any){
+  let aux = [];
+  let aux2 = [];
+  if(data.length > 0){
+      const newData = [...data];
+      for(const v of newData){
+          aux = v.timestamp.toISOString().split('T');
+          // console.log(aux);
+          aux2 = aux[0].split('-');
+          // console.log(aux2);
+          v.timestamp = aux2[2] + '/' +aux2[1] + '/' +aux2[0];
+      }
+      return newData;
+  }
+  return 'error';
 }
