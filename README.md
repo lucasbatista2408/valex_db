@@ -27,7 +27,7 @@
 	  
 ## 2.Activate Card
 
-	In order for the employee activate their card, they need to send the security code and the new password in the body of the request, 
+	In order for the employee activate their card, they need to send the security code and the new password in the body of the request,
 	and also the cardId.
 		
 	path: http://localhost:4000/activate-card
@@ -42,7 +42,8 @@
 
 ## 3.Show Balance
 
-	Shows the balance of the card and all the recharges made by the company and transactions. The employee needs to provide de cardId only.
+	Shows the balance of the card and all the recharges made by the company and transactions. The employee needs to provide de
+	cardId only.
 		
 	path: http://localhost:4000/display/balance
 	
